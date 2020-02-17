@@ -12,7 +12,6 @@ var lineCat2 = [];
 var lineCat3 = [];
 var lineCat4 = [];
 
-var total = 0;
 var total1 = 0;
 var total2 = 0;
 var total3 = 0;
@@ -152,7 +151,7 @@ function printCharts(){
     lineChart.options.data[2].dataPoints = lineCat3;
     lineChart.options.data[3].dataPoints = lineCat4;
 
-    total = total1+total2+total3+total4;
+    var total = total1+total2+total3+total4;
     total1=(total1/total)*100;
     total2=(total2/total)*100;
     total3=(total3/total)*100;
@@ -160,14 +159,36 @@ function printCharts(){
 
     //lineChart.render();
 
-    var percentage1=0;
+
+    var PieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ["CAT 1","CAT 2","CAT 3","CAT 4"],
+              datasets: [
+                {
+                    fill: true,
+                    backgroundColor: ["blue", "red","green","yellow"],
+                    data: [total1, total2, total3, total4],
+                    borderColor:	['black', 'black','black', 'black'],
+                    borderWidth: [2,2,2,2]
+                }
+            ]
+        },
+        options: {
+                title: {
+                          display: true,
+                          text: '% of each category',
+                          position: 'top'
+                      },
+                rotation: -0.7 * Math.PI
+        }
+    });
 
     finished = 0;
   }
 }
 
 var lineChart = new CanvasJS.Chart($("#chartContainer2"), {
-	//theme: "light2", // "light1", "light2", "dark1", "dark2"
 	animationEnabled: false,
 	title:{
 		text: "Title"
@@ -229,6 +250,8 @@ dataPoints: []
 ]
 });
 
+var canvas = document.getElementById("barChart");
+var ctx = canvas.getContext('2d');
 
 getData(xhttp1, 'http://s3.amazonaws.com/logtrust-static/test/test/data1.json');
 getData(xhttp2, 'http://s3.amazonaws.com/logtrust-static/test/test/data2.json');
