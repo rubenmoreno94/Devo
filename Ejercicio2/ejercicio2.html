@@ -22,6 +22,7 @@
   </div>
 
 <script>
+//****DECLARACIÓN DE VARIABLES****
   var xhttp1 = new XMLHttpRequest();
   var xhttp2 = new XMLHttpRequest();
   var xhttp3 = new XMLHttpRequest();
@@ -45,7 +46,13 @@
   var canvas = document.getElementById("barChart");
   var ctx = canvas.getContext('2d');
 
+//Definición de un alias para el selector de JQuery con la intención de evitar el conflicto explicado en el README del proyecto
   jq = $.noConflict();
+
+/**
+  Declaración del gráfico lineal cuyos datos se rellenarían más tarde mediante código dependiendo de los datos
+  obtenidos de las diferentes fuentes mediante AJAX
+**/
 
   // var lineChart = new CanvasJS.Chart(jq("#chartContainer2"), {
   // 	animationEnabled: false,
@@ -109,7 +116,11 @@
   // ]
   // });
 
-
+/**
+Funciones que captan el cambio de estado en las peticiones ajax y comienzan a tratar los datos recibidos
+Hay una funcion por cada llamada AJAX
+Al terminar de tratar los datos llaman a la función 'printCharts' que pinta los gráficos
+**/
   xhttp1.onreadystatechange = function() {
     var category;
     var date;
@@ -173,11 +184,28 @@
     }
   };
 
+//****DECLARACIÓN DE FUNCIONES****
+
+/**
+Función invocada con el click del botón que realiza las llamadas AJAX a las diferentes fuentes de datos
+**/
+  function clickButton(){
+    getData(xhttp1, 'http://s3.amazonaws.com/logtrust-static/test/test/data1.json');
+    getData(xhttp2, 'http://s3.amazonaws.com/logtrust-static/test/test/data2.json');
+    getData(xhttp3, 'http://s3.amazonaws.com/logtrust-static/test/test/data3.json');
+  }
+
+  /**
+  Recibe un objeto XMLHttpRequest y una fuente de datos a la que lanzar una petición AJAX
+  **/
   function getData(xhttp, source){
     xhttp.open('GET', source, true);
     xhttp.send();
   }
 
+  /**
+  Obtiene la fecha recibida del JSON 'data3.json' mediante una expresión regular
+  **/
   function getDate(raw){
     var myReg = new RegExp("\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])");
     var date;
@@ -187,6 +215,10 @@
     return date[0];
   }
 
+  /**
+  Obtiene la categoria de cada dato de los diferentes JSON y los homogeiniza renombrandolos a mayúsculas
+  para que todos tengan exactamente la misma nomenclatura
+  **/
   function getCategory(category){
     var myReg = new RegExp("\\b(C|c)(A|a)(T|t) [1-9][0-9]?\\b");
     var result;
@@ -196,6 +228,10 @@
     return result[0].toUpperCase();
   }
 
+  /**
+  Actualiza el mapa 'categoryMap' pasado por parámetro añadiendo una nueva entrada con clave 'date' y valor 'value'
+  Si ya existiera la clave 'date' actualiza su valor
+  **/
   function updateGroups(date, value, categoryMap){
     if(!categoryMap.has(date)){
       categoryMap.set(date, value);
@@ -205,6 +241,15 @@
     }
   }
 
+  /**
+  Si ya se han recibido datos de las 3 llamadas AJAX:
+
+  -Ordena los mapas con los datos por categoría para que las fechas aparezcan en el gŕafico lineal
+  cronológicamente e introduce cada uno de los datos a este gráfico.
+
+  -Calcula el % que representa cada una de las categorías respecto al total y pinta
+  el gráfico circular.
+  **/
   function printCharts(){
     finished++;
     if(finished == 3){
@@ -279,11 +324,6 @@
     }
   }
 
-  function clickButton(){
-    getData(xhttp1, 'http://s3.amazonaws.com/logtrust-static/test/test/data1.json');
-    getData(xhttp2, 'http://s3.amazonaws.com/logtrust-static/test/test/data2.json');
-    getData(xhttp3, 'http://s3.amazonaws.com/logtrust-static/test/test/data3.json');
-  }
 </script>
 
 </body>
